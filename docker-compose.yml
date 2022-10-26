@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  mlflow:
+    container_name: tracker_mlflow
+    image: tracker_ml
+    restart: unless-stopped
+    build:
+      context: ./mlflow
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - MLFLOW_TRACKING_URI=http://localhost:5000
+    networks:
+      - public
+      - internal
+    entrypoint: bash ./wait-for-it.sh db:3306 -t 90 -- mlflow server -h 0.0.0.0
+networks:
+  internal:
+  public:
+    driver: bridge
+volumes:
+  db_volume:
+  minio_volume:
